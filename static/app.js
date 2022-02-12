@@ -1,18 +1,23 @@
 const API = 'http://localhost:3000'
 
 // start
-// --
-// const populateProducts = async () => {
-// ++
-const populateProducts = async (categoryName) => {
+// ---
+// const populateProducts = async (categoryName) => {
+// +++
+const populateProducts = async (categoryName, method = 'GET', payload) => {
 // end
   const products = document.querySelector('#products')
   products.innerHTML = ''
   // start
-  // --
-  // const res = await fetch(API)
-  // ++
-  const res = await fetch(`${API}/${categoryName}`)
+  // +++
+  const send = method === 'GET' ? {} : {
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(payload)
+  }
+  // ---
+  // const res = await fetch(`${API}/${categoryName}`)
+  // +++
+  const res = await fetch(`${API}/${categoryName}`, { method, ...send })
   // end
   const data = await res.json()
   // **
@@ -28,16 +33,32 @@ const populateProducts = async (categoryName) => {
   }
 }
   
-// start
-// --
-// document.querySelector('#fetch').addEventListener('click', async () => {
-//   await populateProducts()
-// })
-// ++
 const category = document.querySelector('#category')
-// ++
+// start
+// +++
+const add = document.querySelector('#add')
+// end
+
 category.addEventListener('input', async ({ target }) => {
+  // start
+  // +++
+  add.style.display = 'block'
+  // end
   await populateProducts(target.value)
+})
+
+// start
+// +++
+add.addEventListener('submit', async (e) => {
+  e.preventDefault()
+  const { target } = e
+  const payload = {
+    name: target.name.value,
+    rrp: target.rrp.value,
+    info: target.info.value
+  }
+  await populateProducts(category.value, 'POST', payload)
+  target.reset()
 })
 // end
 
